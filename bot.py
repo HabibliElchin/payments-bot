@@ -28,24 +28,15 @@ async def send_today_payments(context):
     today = datetime.datetime.now().day
     rows = sheet.get_all_records()
 
-    found = False
+    await context.bot.send_message(chat_id=CHAT_ID, text=f"DEBUG: today = {today}")
 
     for i, row in enumerate(rows, start=2):
-        if int(float(row["День оплаты"])) == today and row["Статус"] != "paid":
-            found = True
+        val = row["День оплаты"]
 
-            text = f"{row['Имя']} — {row['Сумма']}₼"
-
-            keyboard = [[
-                InlineKeyboardButton("✅ Оплатил", callback_data=f"paid_{i}"),
-                InlineKeyboardButton("❌ Не оплатил", callback_data=f"no_{i}")
-            ]]
-
-            await context.bot.send_message(
-                chat_id=CHAT_ID,
-                text=text,
-                reply_markup=InlineKeyboardMarkup(keyboard)
-            )
+        await context.bot.send_message(
+            chat_id=CHAT_ID,
+            text=f"{row['Имя']} | raw: {val} | type: {type(val)}"
+        )
 
     if not found:
         await context.bot.send_message(
