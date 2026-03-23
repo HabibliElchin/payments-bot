@@ -25,7 +25,7 @@ sheet = client.open("Payments").sheet1
 
 # 🔔 показать сегодняшние платежи
 async def send_today_payments(context):
-    today = datetime.datetime.now().day
+    datetime.datetime.utcnow() + datetime.timedelta(hours=4)
     rows = sheet.get_all_records()
 
     await context.bot.send_message(chat_id=CHAT_ID, text=f"DEBUG: today = {today}")
