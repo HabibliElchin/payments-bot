@@ -31,7 +31,7 @@ async def send_today_payments(context):
     found = False
 
     for i, row in enumerate(rows, start=2):
-        if row["День оплаты"] == today and row["Статус"] != "paid":
+        if int(row["День оплаты"]) == today and row["Статус"] != "paid":
             found = True
 
             text = f"{row['Имя']} — {row['Сумма']}₼"
