@@ -23,7 +23,7 @@ client = gspread.authorize(creds)
 sheet = client.open("Payments").sheet1
 
 
-# 🔔 функция отправки (используем и в daily и в /today)
+# 🔔 показать сегодняшние платежи
 async def send_today_payments(context):
     today = datetime.datetime.now().day
     rows = sheet.get_all_records()
@@ -59,12 +59,12 @@ async def daily_job(context: ContextTypes.DEFAULT_TYPE):
     await send_today_payments(context)
 
 
-# 📅 команда /today
+# 📅 команда today
 async def today_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await send_today_payments(context)
 
 
-# 📊 команда /debts (должники)
+# 📊 должники
 async def debts_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     rows = sheet.get_all_records()
 
@@ -80,6 +80,32 @@ async def debts_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text = "Все оплатили 👍"
 
     await update.message.reply_text(text)
+
+
+# 💰 доход
+async def income_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    rows = sheet.get_all_records()
+
+    total = 0
+
+    for row in rows:
+        if row["Статус"] == "paid":
+            total += int(row["Сумма"])
+
+    await update.message.reply_text(f"💰 Доход: {total}₼")
+
+
+# 🔁 сброс месяца
+async def reset_month(context: ContextTypes.DEFAULT_TYPE):
+    rows = sheet.get_all_records()
+
+    for i, row in enumerate(rows, start=2):
+        sheet.update_cell(i, 6, "pending")
+
+    await context.bot.send_message(
+        chat_id=CHAT_ID,
+        text="🔄 Новый месяц — все статусы сброшены"
+    )
 
 
 # ✅ кнопки
@@ -103,7 +129,12 @@ app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(CallbackQueryHandler(button_handler))
 app.add_handler(CommandHandler("today", today_command))
 app.add_handler(CommandHandler("debts", debts_command))
+app.add_handler(CommandHandler("income", income_command))
 
+# ежедневка
 app.job_queue.run_daily(daily_job, time=datetime.time(hour=9, minute=0))
+
+# сброс 1 числа каждого месяца
+app.job_queue.run_monthly(reset_month, when=datetime.time(hour=0, minute=1), day=1)
 
 app.run_polling()
