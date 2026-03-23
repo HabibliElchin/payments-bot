@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "payments-bot-491120",
+  "private_key_id": "426e19a352b19b44063703f0b1074e1e80e91df4",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDh8XiTuCG5zOI8\nkgsakx/AVhqfgW8uVjeGGyTdmTs2u3K0pAAjoDSjrUtEwECwLc3lFP71x8/354sN\nM+ozmcP5NlJp3CVWZJatUYRXBvoA/p1oL8vze71Z4YFAj2S9rd554xSDNWEECp7o\nYrPaUC0QCjkMKCIIajdsbqZPmyJL4a4pb9pnHwwXvKso8QokvGXS9XRPR4RvdSxE\nutpK8s2YRmqpqM1duOvxC37INz15pcCMVkmn7Bdq8PDZl2dYR/7vx3zMgg3t0Yy1\n0sjDoFl8nuILCdn+vH/rbsM0JndLjBPYUmAMeAIdp7zt2JLmhzUVvdFdAo8D8Cph\nEWYJGqUtAgMBAAECggEAAsqX7G3xmg5fm9NLaH2kKR0nNmHup1+QpLXVzm25NI47\noY2xJBTeRvNkzamjuEl96gmeCMKk3XGH30GNRYFDJuNhQJuOqTLpmvnkglVnZfcU\np20yaNoA1zPDrrIsKB0WIDgKUICqp9Z1wMs6C5rCo8MXPKuLmBev2EVvBTwWareO\nHOBJjI2tdm3Cx1Bz43VsYjgaNSBiljdthBH0iVZAKhyDCF2/GmGzVNKuHRGIubBW\nDz5kTd467gNMSJef/K3rP1s/5nb6S9FO6nYN7LLMUDkXBccAenATt+Gp8wMXFuzs\nQZ3+A0sFGhSyJ+ktRnxGL7Ebk/UaFWbAVvi4vaFQQQKBgQDzPIBznlx708VnTqxh\nqUX+Nkngkl6erThVb4etlcnh767uST7lIBvqkGUizfIou1toiju7mWDkVg1n9L5x\n44wfVFP9CdQ4Y38bIDoSEg5gFbYdQVWr4/6MAhC1U1mHHTdl1Uu0QkjmrqD4AtSV\nY9HOX6NpFN8SJkma2wSSPBF93QKBgQDtzKnrGl45Y01pPlGOsGBtao9oWVYs63EX\n6es1yNSNiIyVtaQlifrlY2Ltf+oWJfpTFQmEzjC7ETvCryA7cjvzBJTu1Gx16HUz\nyp5jZ+H2wq9AdL/MRBdh2YsBVVpX/QC6svQ9JGPjwRYU7i100Sh9K7v+wzvSEz4X\nrH/L/vmXkQKBgQCYQ+2dcysuERnoW+WplU/NnaqNvNMivgkf4puq3LPujh6R6KRI\nxtry8cV+DjJjsTW9sZtHCvMOvZfS1fFKVknnauDQ7JA/ZHmzP29a1JbPK4g/tCCv\nZCB7AOf4ut62qGF/jBDCHSSJ1BPMbekqQ7yZVmFzbK9gKzu0hxrLeHLyuQKBgHbu\nOjlMOb3H7WpqcY3EpqVyewC8VX4nzqsgIbQHmk6i8XTaoJrptGLPXyXbKK8lFVpC\nFj2mhfa5OsM2pQ82Jcd4DiiYcxpRRXS+rJKY3Ql1+wJooZg+odcdXwkur/17msbF\nQ6PktFSvOCUFrhRTm0Vm/yH+cMezOgXLDytufVQRAoGAZwAf7x0j8NL+mhyL4mlR\njEokq2Jz81L64ArpFz5sccoGWYhvgXesvYoOV6jmmMG4twdoaAXkG4oPGAgZ9Z3a\n3v0ibDQtyHQQKVW+fPG7ZbMEyC64OUP517C6e/a3aobsc+hNgvXVhjz97ouZGJMp\nxKPGk71Z0Fds2T6mShbkcUY=\n-----END PRIVATE KEY-----\n",
+  "client_email": "payments-bot@payments-bot-491120.iam.gserviceaccount.com",
+  "client_id": "108391875197512221578",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/payments-bot%40payments-bot-491120.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
