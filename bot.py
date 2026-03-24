@@ -12,7 +12,7 @@ import os
 import json
 
 TOKEN = os.getenv("TOKEN")
-CHAT_ID = int(os.getenv("CHAT_ID"))
+CHAT_ID = int(os.getenv("CHAT_ID"))  # используется только для авто-уведомлений
 
 # 🌍 timezone (Азербайджан UTC+4)
 def get_now():
@@ -29,7 +29,7 @@ client = gspread.authorize(creds)
 sheet = client.open("Payments").sheet1
 
 
-# 🔔 отправка сегодняшних оплат
+# 🔔 отправка платежей
 async def send_today_payments(context, chat_id):
     today = get_now().day
     rows = sheet.get_all_records()
@@ -53,26 +53,27 @@ async def send_today_payments(context, chat_id):
             ]]
 
             await context.bot.send_message(
-                chat_id=chat_id
+                chat_id=chat_id,
                 text=text,
                 reply_markup=InlineKeyboardMarkup(keyboard)
             )
 
     if not found:
         await context.bot.send_message(
-            chat_id=CHAT_ID,
+            chat_id=chat_id,
             text="Сегодня никто не должен платить 👍"
         )
 
 
-# ⏰ ежедневка
-async def daily_job(context):
+# ⏰ ежедневка (идёт в заданный CHAT_ID — например группа)
+async def daily_job(context: ContextTypes.DEFAULT_TYPE):
     await send_today_payments(context, CHAT_ID)
 
 
-# 📅 /today
+# 📅 /today (отвечает туда где вызвали)
 async def today_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await send_today_payments(context)
+    chat_id = update.effective_chat.id
+    await send_today_payments(context, chat_id)
 
 
 # 📊 /debts
@@ -145,7 +146,7 @@ app.add_handler(CommandHandler("today", today_command))
 app.add_handler(CommandHandler("debts", debts_command))
 app.add_handler(CommandHandler("income", income_command))
 
-# ежедневное уведомление
+# ежедневные уведомления
 app.job_queue.run_daily(
     daily_job,
     time=datetime.time(hour=9, minute=0)
