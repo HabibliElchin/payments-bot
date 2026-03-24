@@ -30,7 +30,7 @@ sheet = client.open("Payments").sheet1
 
 
 # 🔔 отправка сегодняшних оплат
-async def send_today_payments(context):
+async def send_today_payments(context, chat_id):
     today = get_now().day
     rows = sheet.get_all_records()
 
@@ -53,7 +53,7 @@ async def send_today_payments(context):
             ]]
 
             await context.bot.send_message(
-                chat_id=CHAT_ID,
+                chat_id=chat_id
                 text=text,
                 reply_markup=InlineKeyboardMarkup(keyboard)
             )
@@ -66,8 +66,8 @@ async def send_today_payments(context):
 
 
 # ⏰ ежедневка
-async def daily_job(context: ContextTypes.DEFAULT_TYPE):
-    await send_today_payments(context)
+async def daily_job(context):
+    await send_today_payments(context, CHAT_ID)
 
 
 # 📅 /today
