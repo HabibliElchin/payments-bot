@@ -6,25 +6,22 @@ from telegram.ext import (
     ApplicationBuilder,
     CallbackQueryHandler,
     ContextTypes,
-    CommandHandler,
+    CommandHandler
 )
 import os
 import json
-from zoneinfo import ZoneInfo
+import asyncio
 
 TOKEN = os.getenv("TOKEN")
-CHAT_ID = int(os.getenv("CHAT_ID"))  # сюда идут автоматические сообщения
+CHAT_ID = int(os.getenv("CHAT_ID"))
 
-BAKU_TZ = ZoneInfo("Asia/Baku")
-
-
+# 🌍 timezone (Баку)
 def get_now():
-    return datetime.datetime.now(BAKU_TZ)
-
+    return datetime.datetime.utcnow() + datetime.timedelta(hours=4)
 
 scope = [
     "https://spreadsheets.google.com/feeds",
-    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/drive"
 ]
 
 creds_dict = json.loads(os.getenv("GOOGLE_CREDS"))
@@ -33,6 +30,7 @@ client = gspread.authorize(creds)
 sheet = client.open("Payments").sheet1
 
 
+# 🔔 отправка платежей
 async def send_today_payments(context, chat_id):
     today = get_now().day
     rows = sheet.get_all_records()
@@ -42,7 +40,7 @@ async def send_today_payments(context, chat_id):
     for i, row in enumerate(rows, start=2):
         try:
             day = int(float(row["День оплаты"]))
-        except Exception:
+        except:
             continue
 
         if day == today and row["Статус"] != "paid":
@@ -58,24 +56,22 @@ async def send_today_payments(context, chat_id):
             await context.bot.send_message(
                 chat_id=chat_id,
                 text=text,
-                reply_markup=InlineKeyboardMarkup(keyboard),
+                reply_markup=InlineKeyboardMarkup(keyboard)
             )
 
     if not found:
         await context.bot.send_message(
             chat_id=chat_id,
-            text="Сегодня никто не должен платить 👍",
+            text="Сегодня никто не должен платить 👍"
         )
 
 
-async def daily_job(context: ContextTypes.DEFAULT_TYPE):
-    await send_today_payments(context, CHAT_ID)
-
-
+# 📅 /today
 async def today_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await send_today_payments(context, update.effective_chat.id)
 
 
+# 📊 /debts
 async def debts_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     rows = sheet.get_all_records()
 
@@ -93,6 +89,7 @@ async def debts_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(text)
 
 
+# 💰 /income
 async def income_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     rows = sheet.get_all_records()
     total = 0
@@ -101,24 +98,26 @@ async def income_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if row["Статус"] == "paid":
             try:
                 total += int(float(row["Сумма"]))
-            except Exception:
+            except:
                 pass
 
     await update.message.reply_text(f"💰 Доход: {total}₼")
 
 
-async def reset_month(context: ContextTypes.DEFAULT_TYPE):
+# 🔁 сброс месяца
+async def reset_month(context):
     rows = sheet.get_all_records()
 
-    for i, _row in enumerate(rows, start=2):
+    for i, _ in enumerate(rows, start=2):
         sheet.update_cell(i, 6, "pending")
 
     await context.bot.send_message(
         chat_id=CHAT_ID,
-        text="🔄 Новый месяц — все статусы сброшены",
+        text="🔄 Новый месяц — все статусы сброшены"
     )
 
 
+# ✅ кнопки
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -133,6 +132,32 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text("❌ Не оплачено")
 
 
+# 🔥 НАДЁЖНЫЙ SCHEDULER (вместо job_queue)
+async def scheduler(app):
+    last_day_sent = None
+    reset_done = False
+
+    while True:
+        now = get_now()
+
+        # ⏰ отправка в 09:00
+        if now.hour == 9 and now.minute == 0:
+            if last_day_sent != now.day:
+                await send_today_payments(app, CHAT_ID)
+                last_day_sent = now.day
+
+        # 🔁 сброс 1 числа
+        if now.day == 1 and not reset_done:
+            await reset_month(app)
+            reset_done = True
+
+        if now.day != 1:
+            reset_done = False
+
+        await asyncio.sleep(60)
+
+
+# 🚀 запуск
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(CallbackQueryHandler(button_handler))
@@ -140,19 +165,11 @@ app.add_handler(CommandHandler("today", today_command))
 app.add_handler(CommandHandler("debts", debts_command))
 app.add_handler(CommandHandler("income", income_command))
 
-# Авто-уведомление каждый день в 09:00 по Баку
-app.job_queue.run_daily(
-    daily_job,
-    time=datetime.time(hour=9, minute=0, tzinfo=BAKU_TZ),
-    name="daily_payments",
-)
 
-# Сброс 1 числа каждого месяца в 00:01 по Баку
-app.job_queue.run_monthly(
-    reset_month,
-    when=datetime.time(hour=0, minute=1, tzinfo=BAKU_TZ),
-    day=1,
-    name="monthly_reset",
-)
+async def main():
+    asyncio.create_task(scheduler(app))
+    await app.run_polling()
 
-app.run_polling()
+
+if __name__ == "__main__":
+    asyncio.run(main())
